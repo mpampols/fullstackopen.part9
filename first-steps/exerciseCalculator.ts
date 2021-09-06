@@ -23,30 +23,30 @@ const parseCalculatorArguments = (args: Array<string>): ExerciseValues => {
     Number(args[7]),
     Number(args[8]),
     Number(args[9])
-  ]
+  ];
   return {
     targetValue: Number(args[2]),
     arrayValues: daysArray
-  }
-}
+  };
+};
 
-const calculateExercises = (targetAverage: number, arrayValues: Array<number>): ExerciseStats => {
-  const periodLength: number = arrayValues.length
-  const trainingDays: number = arrayValues.filter(day => day !== 0).length
-  const average: number = (arrayValues[0] + arrayValues[1] + arrayValues[2] + arrayValues[3] + arrayValues[4] + arrayValues[5] + arrayValues[6]) / 7
-  const success: boolean = (average >= targetAverage) ? true : false
-  let rating: number = 0
-  let ratingDescription: string = null
+export const calculateExercises = (targetAverage: number, arrayValues: Array<number>): ExerciseStats =>{
+  const periodLength: number = arrayValues.length;
+  const trainingDays: number = arrayValues.filter(day => day !== 0).length;
+  const average: number = (arrayValues[0] + arrayValues[1] + arrayValues[2] + arrayValues[3] + arrayValues[4] + arrayValues[5] + arrayValues[6]) / 7;
+  const success: boolean = (average >= targetAverage) ? true : false;
+  let rating = 0;
+  let ratingDescription = "";
 
   if ((average * 100 / targetAverage) >= 100) {
-    rating = 3
-    ratingDescription = 'too bad'
+    rating = 3;
+    ratingDescription = 'too bad';
   } else if ((average * 100 / targetAverage) >= 50) {
-    rating = 2
-    ratingDescription = 'not too bad but could be better'
+    rating = 2;
+    ratingDescription = 'not too bad but could be better';
   } else {
-    rating = 1
-    ratingDescription = 'great'
+    rating = 1;
+    ratingDescription = 'great';
   }
 
   const result = {
@@ -57,14 +57,14 @@ const calculateExercises = (targetAverage: number, arrayValues: Array<number>): 
     ratingDescription,
     target: targetAverage,
     average,
-  }
+  };
 
-  return result
-}
+  return result;
+};
 
 try {
   const { targetValue, arrayValues } = parseCalculatorArguments(process.argv);
   console.log(calculateExercises(targetValue, arrayValues));
 } catch (e) {
-  console.log('Error, something bad happened, message: ', e.message);
+  console.log('Error, something bad happened');
 }
