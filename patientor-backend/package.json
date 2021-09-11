@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@types/react-router": "^5.1.16",
+    "cors": "^2.8.5",
     "express": "^4.17.1"
   }
 }
