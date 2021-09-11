@@ -1,11 +1,16 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import { NewPatientEntry, Gender } from '../types/patient';
+import { NewPatientEntry, Gender, Entry } from '../types/patient';
 
 const router = express.Router();
 
 router.get('/', (_req, res) => {
   res.send(patientService.getNonSensitiveEntries());
+});
+
+router.get('/:id', (req, res) => {
+  const patientId = req.params.id;
+  res.send(patientService.getPatient(patientId));
 });
 
 router.post('/', (req, res) => {
@@ -25,7 +30,8 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
     dateOfBirth: parseDateOfBirth(object.dateOfBirth),
     ssn: parseSsn(object.ssn),
     gender: parseGender(object.gender),
-    occupation: parseOccupation(object.occupation)
+    occupation: parseOccupation(object.occupation),
+    entries: parseEntries(object.entries)
   };
 
   return newEntry;
@@ -69,6 +75,15 @@ const parseOccupation = (occupation: unknown): string => {
   }
 
   return occupation;
+};
+
+const parseEntries = (entries: unknown): Entry[] => {
+  if (!entries || !Array.isArray(entries)) {
+    throw new Error(`Incorrect or missing entries: ${entries}`);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return entries;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
