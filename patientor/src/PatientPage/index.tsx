@@ -10,7 +10,7 @@ import { apiBaseUrl } from "../constants";
 import HealthRatingBar from "../components/HealthRatingBar";
 import { useStateValue } from "../state";
 
-const PatientListPage = () => {
+const PatientPage = () => {
   const [{ patients }, dispatch] = useStateValue();
 
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
@@ -41,7 +41,7 @@ const PatientListPage = () => {
     <div className="App">
       <Router>
         <Container textAlign="center">
-          <h3>Patient list</h3>
+          <h3>Patient</h3>
         </Container>
         <Table celled>
           <Table.Header>
@@ -79,4 +79,4 @@ const PatientListPage = () => {
   );
 };
 
-export default PatientListPage;
+export default PatientPage;

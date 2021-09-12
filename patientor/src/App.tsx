@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch, useRouteMatch } from "react-router-dom";
 import { Button, Divider, Header, Container } from "semantic-ui-react";
 
 import { apiBaseUrl } from "./constants";
@@ -8,9 +8,16 @@ import { useStateValue } from "./state";
 import { Patient } from "./types";
 
 import PatientListPage from "./PatientListPage";
+import PatientPage from "./PatientPage";
 
 const App = () => {
-  const [, dispatch] = useStateValue();
+  const [{ patients }, dispatch] = useStateValue();
+
+  const match = useRouteMatch('/patients/:id')
+  const patient = match
+    ? patients.find(patient => patient.id === Number(match.params.id))
+    : null;
+
   React.useEffect(() => {
     void axios.get<void>(`${apiBaseUrl}/ping`);
 
@@ -40,11 +47,15 @@ const App = () => {
             <Route path="/">
               <PatientListPage />
             </Route>
+            <Route path="/patients/:id">
+              <PatientPage patient={patient} />
+            </Route>
           </Switch>
         </Container>
       </Router>
     </div>
   );
+
 };
 
 export default App;
