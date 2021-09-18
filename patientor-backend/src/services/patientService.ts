@@ -4,10 +4,11 @@ import uuid from 'uuid';
 import { NonSensitivePatient, Patient, NewPatientEntry } from '../types/patient';
 
 const patients: Array<NonSensitivePatient> = patientEntries.map(
-  ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+  ({ id, name, dateOfBirth, ssn, gender, occupation, entries }) => ({
     id,
     name,
     dateOfBirth,
+    ssn,
     gender,
     occupation,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/prefer-as-const */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import axios from "axios";
+
 import { BrowserRouter as Router, useParams } from "react-router-dom";
-import { Container, Icon } from "semantic-ui-react";
-import { useStateValue } from "../state";
-import { Entry } from "../types";
+import { Card, Container, Icon } from "semantic-ui-react";
+import { useStateValue, updatePatient } from "../state";
+import { toPatient } from "../utils";
+import { Patient } from "../types";
+import { InvalidPatientError } from "../helpers/errorHelper";
+import { apiBaseUrl } from "../constants";
+import EntryDetails from "./EntryDetails";
 
 const PatientPage = () => {
-  const [{ patients, diagnoses }] = useStateValue();
+  const [{ patients, diagnoses }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
-
-  const patient = patients[id];
+  const fetchStatus = useRef({ shouldFetch: false, hasFetched: false });
 
   const genderIconProps = {
     male: { name: "mars" as "mars", color: "blue" as "blue" },
@@ -18,9 +23,40 @@ const PatientPage = () => {
     other: { name: "genderless" as "genderless", color: "grey" as "grey" },
   };
 
-  if (!patient || !diagnoses) {
-    return null;
+  let patient = patients[id];
+
+  try {
+    patient = toPatient({ ...patient });
+  } catch (e) {
+    if (e instanceof InvalidPatientError && !fetchStatus.current.hasFetched) {
+      fetchStatus.current = { ...fetchStatus.current, shouldFetch: true };
+    } else {
+      console.error(e);
+    }
   }
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      fetchStatus.current = { ...fetchStatus.current, shouldFetch: false };
+      try {
+        const { data: patientFromApi } = await axios.get<Patient>(
+          `${apiBaseUrl}/patients/${id}`
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        dispatch(updatePatient(patientFromApi));
+        fetchStatus.current = { ...fetchStatus.current, hasFetched: true };
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    if (fetchStatus.current.shouldFetch) {
+      void fetchPatient();
+    }
+  }, [id, dispatch]);
+
+  if (!patient) return null;
+  if (Object.keys(diagnoses).length === 0) return null;
 
   return (
     <Router>
@@ -30,19 +66,13 @@ const PatientPage = () => {
       <h1>{ patient.name } <Icon {...genderIconProps[patient.gender]} /></h1>
       <div> ssn: { patient.ssn }</div>
       <div> ocupation: { patient.occupation } </div>
-      <h2>entries</h2>
-      <div> {Object.values(patient.entries).map((entry: Entry) => (
-        <div key={ entry.id }>
-          <div>{ entry.date } { entry.description }</div>
-          {entry.diagnosisCodes &&
-          <ul>
-            {Object.values(entry.diagnosisCodes).map(diagnosisCode => (
-              <li key={ diagnosisCode }>{ diagnosisCode } { diagnoses[diagnosisCode].name }</li>
-            ))}
-          </ul>
-          }
-        </div>
-      ))} </div>
+
+      {patient.entries.length > 0 && <h2>Entries</h2>}
+      <Card.Group>
+        {patient.entries.map((entry) => (
+          <EntryDetails key={entry.id} entry={entry} />
+        ))}
+      </Card.Group>
     </Router>
   );
 };
