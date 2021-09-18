@@ -7,7 +7,7 @@ import { useStateValue } from "../state";
 import { Entry } from "../types";
 
 const PatientPage = () => {
-  const [{ patients }] = useStateValue();
+  const [{ patients, diagnoses }] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
   const patient = patients[id];
@@ -18,10 +18,8 @@ const PatientPage = () => {
     other: { name: "genderless" as "genderless", color: "grey" as "grey" },
   };
 
-  if (!patient) {
+  if (!patient || !diagnoses) {
     return null;
-  } else {
-    console.log(patient);
   }
 
   return (
@@ -39,7 +37,7 @@ const PatientPage = () => {
           {entry.diagnosisCodes &&
           <ul>
             {Object.values(entry.diagnosisCodes).map(diagnosisCode => (
-              <li key={ diagnosisCode }>{ diagnosisCode }</li>
+              <li key={ diagnosisCode }>{ diagnosisCode } { diagnoses[diagnosisCode].name }</li>
             ))}
           </ul>
           }
