@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Route, Link, Switch, useRouteMatch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { Button, Divider, Header, Container } from "semantic-ui-react";
 
 import { apiBaseUrl } from "./constants";
@@ -11,16 +11,9 @@ import PatientListPage from "./PatientListPage";
 import PatientPage from "./PatientPage";
 
 const App = () => {
-  const [{ patients }, dispatch] = useStateValue();
-
-  const match = useRouteMatch('/patients/:id')
-  const patient = match
-    ? patients.find(patient => patient.id === Number(match.params.id))
-    : null;
+  const [, dispatch] = useStateValue();
 
   React.useEffect(() => {
-    void axios.get<void>(`${apiBaseUrl}/ping`);
-
     const fetchPatientList = async () => {
       try {
         const { data: patientListFromApi } = await axios.get<Patient[]>(
@@ -44,11 +37,11 @@ const App = () => {
           </Button>
           <Divider hidden />
           <Switch>
-            <Route path="/">
+            <Route path="/" exact>
               <PatientListPage />
             </Route>
             <Route path="/patients/:id">
-              <PatientPage patient={patient} />
+              <PatientPage />
             </Route>
           </Switch>
         </Container>

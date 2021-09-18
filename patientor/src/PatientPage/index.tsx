@@ -1,81 +1,37 @@
+/* eslint-disable @typescript-eslint/prefer-as-const */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from "react";
-import axios from "axios";
-import { BrowserRouter as Router, Link } from "react-router-dom";
-import { Container, Table, Button, TableCell } from "semantic-ui-react";
-
-import { PatientFormValues } from "../AddPatientModal/AddPatientForm";
-import AddPatientModal from "../AddPatientModal";
-import { Patient } from "../types";
-import { apiBaseUrl } from "../constants";
-import HealthRatingBar from "../components/HealthRatingBar";
+import { BrowserRouter as Router, useParams } from "react-router-dom";
+import { Container, Icon } from "semantic-ui-react";
 import { useStateValue } from "../state";
 
 const PatientPage = () => {
-  const [{ patients }, dispatch] = useStateValue();
+  const [{ patients }] = useStateValue();
+  const { id } = useParams<{ id: string }>();
 
-  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | undefined>();
+  const patient = patients[id];
 
-  const openModal = (): void => setModalOpen(true);
-
-  const closeModal = (): void => {
-    setModalOpen(false);
-    setError(undefined);
+  const genderIconProps = {
+    male: { name: "mars" as "mars", color: "blue" as "blue" },
+    female: { name: "venus" as "venus", color: "pink" as "pink" },
+    other: { name: "genderless" as "genderless", color: "grey" as "grey" },
   };
 
-  const submitNewPatient = async (values: PatientFormValues) => {
-    try {
-      const { data: newPatient } = await axios.post<Patient>(
-        `${apiBaseUrl}/patients`,
-        values
-      );
-      dispatch({ type: "ADD_PATIENT", payload: newPatient });
-      closeModal();
-    } catch (e) {
-      console.error(e.response?.data || 'Unknown Error');
-      setError(e.response?.data?.error || 'Unknown error');
-    }
-  };
+  if (!patient) {
+    return null;
+  } else {
+    console.log(patient);
+  }
 
   return (
-    <div className="App">
-      <Router>
-        <Container textAlign="center">
-          <h3>Patient</h3>
-        </Container>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Gender</Table.HeaderCell>
-              <Table.HeaderCell>Occupation</Table.HeaderCell>
-              <Table.HeaderCell>Health Rating</Table.HeaderCell>
-              <Table.HeaderCell>Options</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {Object.values(patients).map((patient: Patient) => (
-              <Table.Row key={patient.id}>
-                <Table.Cell>{patient.name}</Table.Cell>
-                <Table.Cell>{patient.gender}</Table.Cell>
-                <Table.Cell>{patient.occupation}</Table.Cell>
-                <Table.Cell>
-                  <HealthRatingBar showText={false} rating={1} />
-                </Table.Cell>
-                <TableCell><Button as={Link} to={`/patients/${patient.id}`} primary>View</Button></TableCell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-        <AddPatientModal
-          modalOpen={modalOpen}
-          onSubmit={submitNewPatient}
-          error={error}
-          onClose={closeModal}
-        />
-        <Button onClick={() => openModal()}>Add New Patient</Button>
-      </Router>
-    </div>
+    <Router>
+      <Container textAlign="center">
+        <h3>Patient</h3>
+      </Container>
+      <h1>{ patient.name } <Icon {...genderIconProps[patient.gender]} /></h1>
+      <div> ssn: { patient.ssn }</div>
+      <div> ocupation: { patient.occupation } </div>
+    </Router>
   );
 };
 
