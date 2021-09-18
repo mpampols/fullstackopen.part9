@@ -13,7 +13,7 @@ import { apiBaseUrl } from "../constants";
 import EntryDetails from "./EntryDetails";
 
 const PatientPage = () => {
-  const [{ patients, diagnoses }, dispatch] = useStateValue();
+  const [{ patients }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
   const fetchStatus = useRef({ shouldFetch: false, hasFetched: false });
 
@@ -56,7 +56,6 @@ const PatientPage = () => {
   }, [id, dispatch]);
 
   if (!patient) return null;
-  if (Object.keys(diagnoses).length === 0) return null;
 
   return (
     <Router>
