@@ -4,6 +4,7 @@ import React from "react";
 import { BrowserRouter as Router, useParams } from "react-router-dom";
 import { Container, Icon } from "semantic-ui-react";
 import { useStateValue } from "../state";
+import { Entry } from "../types";
 
 const PatientPage = () => {
   const [{ patients }] = useStateValue();
@@ -31,6 +32,19 @@ const PatientPage = () => {
       <h1>{ patient.name } <Icon {...genderIconProps[patient.gender]} /></h1>
       <div> ssn: { patient.ssn }</div>
       <div> ocupation: { patient.occupation } </div>
+      <h2>entries</h2>
+      <div> {Object.values(patient.entries).map((entry: Entry) => (
+        <div key={ entry.id }>
+          <div>{ entry.date } { entry.description }</div>
+          {entry.diagnosisCodes &&
+          <ul>
+            {Object.values(entry.diagnosisCodes).map(diagnosisCode => (
+              <li key={ diagnosisCode }>{ diagnosisCode }</li>
+            ))}
+          </ul>
+          }
+        </div>
+      ))} </div>
     </Router>
   );
 };
